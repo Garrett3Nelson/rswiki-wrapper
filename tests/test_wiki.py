@@ -8,14 +8,14 @@ from wikiwrapper import Exchange
 
 @fixture
 def exchange_keys():
-    # Responsible for returning the latest price data
+    # Keys that are returned by a successful query
     return ['id', 'timestamp', 'price', 'volume']
 
 
 def test_exchange_latest(exchange_keys):
-    """Tests an API call to get the latest realtime Grand Exchange price information"""
+    """Tests an API call to get the latest Grand Exchange price information"""
 
-    query_instance = Exchange('osrs', 'latest', id='2|6')
+    query_instance = Exchange('rs', 'latest', id='2|6')
     response = query_instance.content
 
     assert isinstance(response, OrderedDict)
@@ -24,7 +24,7 @@ def test_exchange_latest(exchange_keys):
 
 
 def test_exchange_history(exchange_keys):
-    """Tests an API call to get the latest realtime Grand Exchange price information"""
+    """Tests an API call to get Grand Exchange price history"""
 
     query_instance = Exchange('osrs', 'last90d', id='2')
     response = query_instance.content

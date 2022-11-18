@@ -40,7 +40,7 @@ class WeirdGloop(WikiQuery):
 class Exchange(WeirdGloop):
     def __init__(self, game, endpoint, **kwargs):
         # Used for latest / historical prices. Use RealTimeQuery for real-time OSRS prices
-        # Valid games are 'runescape', 'runescape-fsw-2022', 'osrs', 'osrs-fsw-2022'
+        # Valid games are 'rs', 'rs-fsw-2022', 'osrs', 'osrs-fsw-2022'
         # Valid endpoints are 'latest', 'all', 'last90d', and 'sample'
         # https://api.weirdgloop.org/#/ for full documentation
 
