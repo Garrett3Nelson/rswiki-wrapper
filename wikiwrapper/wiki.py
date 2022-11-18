@@ -69,7 +69,31 @@ class Exchange(WeirdGloop):
 class Runescape(WeirdGloop):
     def __init__(self, endpoint, **kwargs):
         # Used for the general endpoints for Runescape information
-        pass
+
+        # Valid endpoints are:
+        # 'vos' - no kwargs
+        # 'vos/history' - kwarg 'page=X' where X is a page number
+        # 'social' - kwarg 'page=X' where X is a page number
+        # 'social/last' - no kwargs
+        # 'tms/current' - see below
+        # 'tms/next' - see below
+        # kwarg 'lang=X' where X is 'en', 'pt' (english, portuguese), 'id' (returns IDs only), 'full' (returns all)
+        # 'tms/search' - see documentation for full kwarg formatting
+        # kwargs lang=X (optional), start=X (dateString or today), end=X (dateString or today), id=X (item ID)
+        # name=X (only name OR id can be used), number=X (number of total results, number OR end can be used)
+
+        # TODO Fix tms/search - the query does not appear to be working in API sandbox with the default inputs
+        super().__init__('runescape/', game="", endpoint=endpoint, **kwargs)
+
+        self.json = self.response.json(object_pairs_hook=OrderedDict)
+
+        # tms data can be a list or dict, depending on the kwargs used in lang
+        if isinstance(self.json, list):
+            self.content = self.json
+        elif 'data' in self.json.keys():
+            self.content = self.json['data']
+        else:
+            self.content = self.json
 
 
 class MediaWiki(WikiQuery):
