@@ -65,3 +65,14 @@ class Exchange(WeirdGloop):
         else:
             self.content = self.json
 
+
+class Runescape(WeirdGloop):
+    def __init__(self, endpoint, **kwargs):
+        # Used for the general endpoints for Runescape information
+        pass
+
+
+class MediaWiki(WikiQuery):
+    def __init__(self, endpoint, **kwargs):
+        # Used for the overall MediaWiki API for pulling information from the wiki
+        pass

@@ -1,18 +1,8 @@
 # wikiwrapper/osrs.py
 # Contains all functions for OSRS Wiki API calls
 
-from .wiki import WikiQuery
+from .wiki import WikiQuery, create_url
 from collections import OrderedDict
-
-
-def create_url(base_url, **kwargs):
-    # TODO: Validate kwargs against valid options
-
-    if len(kwargs) == 0:
-        return base_url
-
-    # Use f-strings to format the kwargs properly
-    return base_url + '?' + '&'.join(f'{k}={v}' for k, v in kwargs.items())
 
 
 class RealTimeQuery(WikiQuery):
