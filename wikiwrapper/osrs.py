@@ -1,25 +1,25 @@
 # wikiwrapper/osrs.py
 # Contains all functions for OSRS Wiki API calls
 
-import requests
-import config
+from .wiki import WikiQuery
 from collections import OrderedDict
 
 
-def create_url(route, **kwargs):
+def create_url(base_url, **kwargs):
     # TODO: Validate kwargs against valid options
 
-    base_url = 'https://prices.runescape.wiki/api/v1/' + config.ENDPOINT + '/'
-
     if len(kwargs) == 0:
-        return base_url + route
+        return base_url
 
     # Use f-strings to format the kwargs properly
-    return base_url + route + '?' + '&'.join(f'{k}={v}' for k, v in kwargs.items())
+    return base_url + '?' + '&'.join(f'{k}={v}' for k, v in kwargs.items())
 
 
-class RealTimeQuery(dict):
-    def __init__(self, route="", **kwargs):
+class RealTimeQuery(WikiQuery):
+    def __init__(self, route="", endpoint="osrs", **kwargs):
+        # Valid endpoints are 'osrs', 'dmm', and 'fsw'
+        # https://oldschool.runescape.wiki/w/RuneScape:Real-time_Prices for full documentation
+
         # Valid kwargs match API endpoint
         # Latest - Optional kwargs id=X where X is the item ID
         # Mapping - No kwargs allowed
@@ -27,15 +27,10 @@ class RealTimeQuery(dict):
         # Time-Series - Required id=X where X is the item ID
         # Time-Series - Required timestep=X where X is any valid period ('5m', '1hr', '6hr')
 
-        super().__init__()
+        base_url = 'https://prices.runescape.wiki/api/v1/' + endpoint + '/' + route
+        url = create_url(base_url, **kwargs)
+        super().__init__(url)
 
-        url = create_url(route, **kwargs)
-
-        headers = {
-            'User-Agent': config.USER_AGENT
-        }
-
-        self.response = requests.get(url, headers=headers)
         self.json = self.response.json(object_pairs_hook=OrderedDict)
 
 
@@ -57,7 +52,10 @@ class Mapping(RealTimeQuery):
 
 class AvgPrice(RealTimeQuery):
     def __init__(self, route, **kwargs):
+        # Valid routes are '5m' or '1h'
+
         # TODO Validate the timestamp is valid if the kwarg is used
+        # TODO Validate the route is valid (5m, 1h)
         super().__init__(route, **kwargs)
 
         # Response is {'data': {OrderedDict()}}

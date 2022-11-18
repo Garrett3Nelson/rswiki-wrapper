@@ -1,4 +1,4 @@
-from wikiwrapper import Latest
+from wikiwrapper.osrs import Latest
 
 latest_prices = Latest()
 
