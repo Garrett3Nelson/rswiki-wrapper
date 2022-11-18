@@ -94,11 +94,11 @@ The goal of this project is to extend functionality to all distinct APIs and all
 ### Routes Under Development
 * All MediaWiki API routes. The placeholder class is `MediaWiki` 
 * The highest priority MediaWiki route is `ask` which has important `query` arguments which provide detailed game information
-* WeirdGloop RuneScape Information routes, with placeholder `Runescape` class
 
 ### Working Routes
 * All Real-Time API routes
 * WeirdGloop Exchange information
+* WeirdGloop Runescape information except Traveling Merchant Search
 
 ## Contributing
 
