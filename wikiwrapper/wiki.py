@@ -82,7 +82,13 @@ class Runescape(WeirdGloop):
         # kwargs lang=X (optional), start=X (dateString or today), end=X (dateString or today), id=X (item ID)
         # name=X (only name OR id can be used), number=X (number of total results, number OR end can be used)
 
-        # TODO Fix tms/search - the query does not appear to be working in API sandbox with the default inputs
+        if endpoint == 'tms/search':
+            if not self._check_kwargs(**kwargs):
+                print('Keyword Arguments did not pass check, see documentation for allowable args')
+                self.json = None
+                self.content = None
+                return
+
         super().__init__('runescape/', game="", endpoint=endpoint, **kwargs)
 
         self.json = self.response.json(object_pairs_hook=OrderedDict)
@@ -94,6 +100,25 @@ class Runescape(WeirdGloop):
             self.content = self.json['data']
         else:
             self.content = self.json
+
+    def _check_kwargs(self, **kwargs):
+        keys = kwargs.keys()
+
+        # Any one of the below is required kwargs
+        required_args = ['start', 'number', 'name', 'id']
+
+        if not any(x in required_args for x in keys):
+            print('No accepted mandatory keys were detected')
+            return False
+
+        conflicts = [['end', 'number'], ['end', 'id']]
+        for conflict in conflicts:
+            # This line counts how many of each conflicting pair are in the keys. If both are there, return False
+            if len([i for i in conflict if i in keys]) == len(conflict):
+                print('Both conflicting pairs were detected')
+                return False
+
+        return True
 
 
 class MediaWiki(WikiQuery):

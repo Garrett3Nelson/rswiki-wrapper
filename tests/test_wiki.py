@@ -111,3 +111,20 @@ def test_tms_next(tms_keys):
 
     assert isinstance(response, list)
     assert set(tms_keys).issubset(response[0].keys()), "All keys should be in the response"
+
+
+def test_tms_search(tms_keys):
+    """Tests and API call to search Traveling Merchant Shop Information"""
+
+    query_instance = Runescape('tms/search', lang='full', start='today', end='25 November 2022', number=3)
+    response = query_instance.content
+
+    # The above should fail (kwarg check, uses conflicting arguments end & number)
+    assert response is None
+
+    # The below should be successful
+    query_instance = Runescape('tms/search', lang='full', start='today', number=3)
+    response = query_instance.content
+
+    assert isinstance(response, list)
+    assert set(tms_keys).issubset(response[0]['items'][0].keys()), "All keys should be in the response"

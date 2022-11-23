@@ -98,7 +98,7 @@ The goal of this project is to extend functionality to all distinct APIs and all
 ### Working Routes
 * All Real-Time API routes
 * WeirdGloop Exchange information
-* WeirdGloop Runescape information except Traveling Merchant Search
+* WeirdGloop Runescape information
 
 ## Contributing
 
