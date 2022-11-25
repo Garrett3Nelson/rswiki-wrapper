@@ -64,6 +64,14 @@ OrderedDict([('2', OrderedDict([('id', '2'), ('timestamp', '2022-11-18T06:13:09.
 
 For a sample script using the Real-Time API, see `sample.py`
 
+All MediaWiki requests take three inputs:
+* Mandatory Parameter`game` which is 'osrs' or 'rs3' 
+* kwarg `action` per the list from API Documentation
+* Any kwargs which go with your `action`
+
+
+You can test queries in the [API Sandbox](https://runescape.wiki/w/Special:ApiSandbox) to determine the output and assist in parsing the JSON returned. `.json` and `.content` are identical for MediaWiki requests although both are exposed to allow future expansion of known common queries.
+
 ## Tests
 
 Testing for this project is performed using PyTest. All tests are written in `/tests` and should confirm the `.content` is formatted correctly, confirm the response data matches the expected value (if possible) and confirm the response keys match the expected output format.
@@ -92,13 +100,13 @@ def test_exchange_latest(exchange_keys):
 The goal of this project is to extend functionality to all distinct APIs and all available routes. There are still many TODO items throughout the source code which are a reminder of verifications for edge cases that I have identified but have not yet resolved.
 
 ### Routes Under Development
-* All MediaWiki API routes. The placeholder class is `MediaWiki` 
-* The highest priority MediaWiki route is `ask` which has important `query` arguments which provide detailed game information
+* Implement specific common queries in MediaWiki API
 
 ### Working Routes
 * All Real-Time API routes
 * WeirdGloop Exchange information
 * WeirdGloop Runescape information
+* MediaWiki API
 
 ## Contributing
 

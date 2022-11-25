@@ -1,7 +1,7 @@
 # wikiwrapper/wiki.py
 # Contains generic functions for RS Wiki API calls
 
-import requests
+import requests, requests.utils
 from config import USER_AGENT
 from collections import OrderedDict
 
@@ -24,7 +24,7 @@ def create_url(base_url, **kwargs):
         return base_url
 
     # Use f-strings to format the kwargs properly
-    return base_url + '?' + '&'.join(f'{k}={v}' for k, v in kwargs.items())
+    return base_url + '?' + requests.utils.quote('&'.join(f'{k}={v}' for k, v in kwargs.items()), safe="!#$%&'*,/;=?@~")
 
 
 class WeirdGloop(WikiQuery):
@@ -122,6 +122,20 @@ class Runescape(WeirdGloop):
 
 
 class MediaWiki(WikiQuery):
-    def __init__(self, endpoint, **kwargs):
+    def __init__(self, game, **kwargs):
         # Used for the overall MediaWiki API for pulling information from the wiki
-        pass
+
+        if game not in ['osrs', 'rs3']:
+            print('Invalid game; choose osrs or rs3')
+
+        if game == 'osrs':
+            base_url = 'https://oldschool.runescape.wiki/api.php'
+        else:
+            base_url = 'https://runescape.wiki/api.php'
+
+        url = create_url(base_url, **kwargs)
+        super().__init__(url)
+
+        self.json = self.response.json(object_pairs_hook=OrderedDict)
+        self.content = self.json
+

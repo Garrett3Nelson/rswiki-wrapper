@@ -3,7 +3,7 @@
 from pytest import fixture
 from collections import OrderedDict
 
-from wikiwrapper import Exchange, Runescape
+from wikiwrapper import Exchange, Runescape, MediaWiki
 
 
 @fixture
@@ -128,3 +128,12 @@ def test_tms_search(tms_keys):
 
     assert isinstance(response, list)
     assert set(tms_keys).issubset(response[0]['items'][0].keys()), "All keys should be in the response"
+
+
+def test_media_wiki():
+    """Tests the MediaWiki Routes"""
+
+    query_instance = MediaWiki('osrs', action='ask', format='json', query='[[Category:Items]][[Production JSON::+]]|?Production')
+    response = query_instance.response
+
+    assert response.status_code == 200
