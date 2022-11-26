@@ -2,7 +2,7 @@
 # Contains generic functions for RS Wiki API calls
 
 import requests, requests.utils
-from config import USER_AGENT
+from .config import USER_AGENT
 from collections import OrderedDict
 
 

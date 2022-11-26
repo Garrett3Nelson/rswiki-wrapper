@@ -16,7 +16,7 @@ To interface properly with the RuneScape Wiki API, first review their [acceptabl
 
 Each user should identify a method of contact which is submitted in the USER_AGENT. This allows the RuneScape Wiki staff to contact you and correct any misbehaving queries. If using for a full-scale project, renaming the PROJECT_NAME variable will identify your use-case to the staff.
 
-Update the following sections in `config.py`
+Update the following sections in `wikwrapper/config.py`
 
 ```python
 # Insert a method for wiki staff to identify you ('Discord: @Username#1234' for example)
