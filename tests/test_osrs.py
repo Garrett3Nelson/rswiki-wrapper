@@ -68,6 +68,6 @@ def test_timeseries(timeseries_keys):
     query_instance = TimeSeries(id=2, timestep='5m')
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
-    assert set(timeseries_keys).issubset(response.keys()), "All keys should be in the response"
+    assert isinstance(response[0], OrderedDict)
+    assert set(timeseries_keys).issubset(response[0].keys()), "All keys should be in the response"
 

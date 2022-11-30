@@ -58,5 +58,5 @@ class TimeSeries(RealTimeQuery):
         super().__init__(route="timeseries", **kwargs)
 
         # Response is {'data': [{OrderedDict()}]}
-        self.content = self.json['data'][0]
+        self.content = self.json['data']
 
