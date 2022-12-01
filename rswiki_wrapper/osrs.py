@@ -1,4 +1,4 @@
-# wikiwrapper/osrs.py
+# rswiki_wrapper/osrs.py
 # Contains all functions for OSRS Wiki API calls
 
 from .wiki import WikiQuery, create_url

@@ -1,17 +1,20 @@
-# wikiwrapper/wiki.py
+# rswiki_wrapper/wiki.py
 # Contains generic functions for RS Wiki API calls
 
-import requests, requests.utils
-from .config import USER_AGENT
+import requests
+import requests.utils
 from collections import OrderedDict
 
 
 class WikiQuery(object):
-    def __init__(self, url, **kwargs):
+    def __init__(self, url, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         super().__init__()
 
+        if user_agent == 'RS Wiki API Python Wrapper - Default':
+            print("WARNING: You are using the default user_agent. Please configure the query with the parameter user_agent='{Project Name} - {Contact Information}'")
+
         headers = {
-            'User-Agent': USER_AGENT
+            'User-Agent': user_agent
         }
 
         self.response = requests.get(url, headers=headers)
@@ -28,17 +31,17 @@ def create_url(base_url, **kwargs):
 
 
 class WeirdGloop(WikiQuery):
-    def __init__(self, route, game, endpoint, **kwargs):
+    def __init__(self, route, game, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # https://api.weirdgloop.org/#/ for full documentation
 
         base_url = 'https://api.weirdgloop.org/' + route + game + '/' + endpoint
         url = create_url(base_url, **kwargs)
 
-        super().__init__(url)
+        super().__init__(url, user_agent)
 
 
 class Exchange(WeirdGloop):
-    def __init__(self, game, endpoint, **kwargs):
+    def __init__(self, game, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # Used for latest / historical prices. Use RealTimeQuery for real-time OSRS prices
         # Valid games are 'rs', 'rs-fsw-2022', 'osrs', 'osrs-fsw-2022'
         # Valid endpoints are 'latest', 'all', 'last90d', and 'sample'
@@ -51,7 +54,7 @@ class Exchange(WeirdGloop):
         # For latest: multiple id or names can be used with "|" as the separator ie id='2|4'
         # This option is not available in any of the history (all, last90d, sample) modes
 
-        super().__init__('exchange/history/', game, endpoint, **kwargs)
+        super().__init__('exchange/history/', game, endpoint, user_agent, **kwargs)
         self.json = self.response.json(object_pairs_hook=OrderedDict)
 
         # Exposing .content as the "user desired data" for consistency
@@ -67,7 +70,7 @@ class Exchange(WeirdGloop):
 
 
 class Runescape(WeirdGloop):
-    def __init__(self, endpoint, **kwargs):
+    def __init__(self, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # Used for the general endpoints for Runescape information
 
         # Valid endpoints are:
@@ -89,7 +92,7 @@ class Runescape(WeirdGloop):
                 self.content = None
                 return
 
-        super().__init__('runescape/', game="", endpoint=endpoint, **kwargs)
+        super().__init__('runescape/', game="", endpoint=endpoint, user_agent=user_agent, **kwargs)
 
         self.json = self.response.json(object_pairs_hook=OrderedDict)
 
@@ -122,7 +125,7 @@ class Runescape(WeirdGloop):
 
 
 class MediaWiki(WikiQuery):
-    def __init__(self, game, **kwargs):
+    def __init__(self, game, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # Used for the overall MediaWiki API for pulling information from the wiki
 
         if game not in ['osrs', 'rs3']:
@@ -134,7 +137,7 @@ class MediaWiki(WikiQuery):
             base_url = 'https://runescape.wiki/api.php'
 
         url = create_url(base_url, **kwargs)
-        super().__init__(url)
+        super().__init__(url, user_agent)
 
         self.json = self.response.json(object_pairs_hook=OrderedDict)
         self.content = self.json

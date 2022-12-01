@@ -3,7 +3,7 @@
 from pytest import fixture
 from collections import OrderedDict
 
-from wikiwrapper import Exchange, Runescape, MediaWiki
+from rswiki_wrapper import Exchange, Runescape, MediaWiki
 
 
 @fixture

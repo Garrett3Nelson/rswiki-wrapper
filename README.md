@@ -8,23 +8,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Requirements
 
-To begin developing and testing this wrapper, set up a python environment with the prerequisites noted in Requirements.txt. No other environment setup is currently required.
+To begin using the wrapper, you can install with pip 
 
-### Configuration
+`pip install rswiki-wrapper`
 
-To interface properly with the RuneScape Wiki API, first review their [acceptable use policy](https://runescape.wiki/w/Help:APIs#Acceptable_use_policy). To assist, I have created a configuration file.
+The package is imported with `import rswiki_wrapper` or `from rswiki_wrapper import Exchange`
 
-Each user should identify a method of contact which is submitted in the USER_AGENT. This allows the RuneScape Wiki staff to contact you and correct any misbehaving queries. If using for a full-scale project, renaming the PROJECT_NAME variable will identify your use-case to the staff.
-
-Update the following sections in `wikwrapper/config.py`
-
-```python
-# Insert a method for wiki staff to identify you ('Discord: @Username#1234' for example)
-CONTACT_NAME = ''
-
-# Identify your project name
-PROJECT_NAME = 'RS Wiki API Python Wrapper'
-```
+To begin developing and testing this wrapper, set up a python environment with the prerequisites noted in [requirements.txt](requirements.txt).
 
 ## Usage
 
@@ -39,18 +29,24 @@ For information on the various acceptable routes, queries, and optional argument
 * [WeirdGloop API](https://api.weirdgloop.org/#/) for requests to use the WeirdGloop API, which provides data for the RuneScape Grand Exchange and RuneScape Information. RuneScape Grand Exchange data is valid for both OldSchool RuneScape and RuneScape. RuneScape information is valid only for RuneScape (RS3).
 * [Real-Time API](https://oldschool.runescape.wiki/w/RuneScape:Real-time_Prices) for access to real-time Grand Exchange data. This endpoint is valid only for OldSchool RuneScape.
 
+### Acceptable Use Policy
+
+To interface properly with the RuneScape Wiki API, first review their [acceptable use policy](https://runescape.wiki/w/Help:APIs#Acceptable_use_policy).
+
+To assist in the user setup, each child class accepts a `user_agent` parameter. Each user should identify a method of contact which will be submitted in each request header. This allows the RuneScape Wiki staff to contact you and correct any misbehaving queries. I recommend using the format `user_agent='{Project Name} - {Contact}'`. The library contains a generic user agent which identifies you as using this wrapper and will warn you to use a custom user agent.
+
 ### Sample Usage
 
-All requests are initiated using a sub-class dedicated to the specific route. For example, using the Exchange sub-class to obtain the day's Grand Exchange information from  WeirdGloop:
+All requests are initiated using a child class dedicated to the specific route. For example, using the Exchange child class to obtain the day's Grand Exchange information from  WeirdGloop:
 
 The URL for WeirdGloop requests follows the format `https://api.weirdgloop.org/exchange/history/{game}/{filter}?{args}`
 
-Setting up an Exchange class follows the same format, using `endpoint` instead of the existing python `filter` as an argument `Exchange(game, endpoint, **kwargs)`:
+Setting up an Exchange class follows the same format, using `endpoint` instead of the existing python `filter` as an argument `Exchange(game, endpoint, user_agent, **kwargs)`:
 
 ```python
-from wikiwrapper import Exchange
+from rswiki_wrapper import Exchange
 
-exchange = Exchange('osrs', 'latest', id="2|6")
+exchange = Exchange('osrs', 'latest', user_agent='Price Scraper - Garrett3Nelson', id="2|6")
 ```
 
 Can be used as follows:

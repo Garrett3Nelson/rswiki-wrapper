@@ -3,7 +3,7 @@
 from pytest import fixture
 from collections import OrderedDict
 
-from wikiwrapper import Latest, Mapping, AvgPrice, TimeSeries
+from rswiki_wrapper import Latest, Mapping, AvgPrice, TimeSeries
 
 
 @fixture
