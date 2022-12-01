@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 
 class RealTimeQuery(WikiQuery):
-    def __init__(self, route="", endpoint="osrs", **kwargs):
+    def __init__(self, route="", endpoint="osrs", user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # Valid endpoints are 'osrs', 'dmm', and 'fsw'
         # https://oldschool.runescape.wiki/w/RuneScape:Real-time_Prices for full documentation
 
@@ -19,43 +19,43 @@ class RealTimeQuery(WikiQuery):
 
         base_url = 'https://prices.runescape.wiki/api/v1/' + endpoint + '/' + route
         url = create_url(base_url, **kwargs)
-        super().__init__(url)
+        super().__init__(url, user_agent=user_agent)
 
         self.json = self.response.json(object_pairs_hook=OrderedDict)
 
 
 class Latest(RealTimeQuery):
-    def __init__(self, **kwargs):
-        super().__init__(route="latest", **kwargs)
+    def __init__(self, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
+        super().__init__(route="latest", user_agent=user_agent, **kwargs)
 
         # Response is {'data': {OrderedDict()}}
         self.content = self.json['data']
 
 
 class Mapping(RealTimeQuery):
-    def __init__(self, **kwargs):
-        super().__init__(route="mapping")
+    def __init__(self, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
+        super().__init__(route="mapping", user_agent=user_agent)
 
         # Response is [OrderedDict()] so the content is the first index in the list
         self.content = self.json[0]
 
 
 class AvgPrice(RealTimeQuery):
-    def __init__(self, route, **kwargs):
+    def __init__(self, route, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # Valid routes are '5m' or '1h'
 
         # TODO Validate the timestamp is valid if the kwarg is used
         # TODO Validate the route is valid (5m, 1h)
-        super().__init__(route, **kwargs)
+        super().__init__(route, user_agent=user_agent, **kwargs)
 
         # Response is {'data': {OrderedDict()}}
         self.content = self.json['data']
 
 
 class TimeSeries(RealTimeQuery):
-    def __init__(self, **kwargs):
+    def __init__(self, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         # TODO Validate the timestep is valid (5m, 1h, 6h)
-        super().__init__(route="timeseries", **kwargs)
+        super().__init__(route="timeseries", user_agent=user_agent, **kwargs)
 
         # Response is {'data': [{OrderedDict()}]}
         self.content = self.json['data']
