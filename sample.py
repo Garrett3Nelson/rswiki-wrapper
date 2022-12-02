@@ -1,4 +1,4 @@
-from wikiwrapper import Latest
+from rswiki_wrapper import Latest
 
 latest_prices = Latest()
 
