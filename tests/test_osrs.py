@@ -35,8 +35,8 @@ def test_mapping_keys(mapping_keys):
     query_instance = Mapping()
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
-    assert set(mapping_keys).issubset(response.keys()), "All keys should be in the response"
+    assert isinstance(response, list)
+    assert set(mapping_keys).issubset(response[0].keys()), "All keys should be in the response"
 
 
 @fixture

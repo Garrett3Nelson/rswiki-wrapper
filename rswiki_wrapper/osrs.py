@@ -36,8 +36,8 @@ class Mapping(RealTimeQuery):
     def __init__(self, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         super().__init__(route="mapping", user_agent=user_agent)
 
-        # Response is [OrderedDict()] so the content is the first index in the list
-        self.content = self.json[0]
+        # Response is [OrderedDict()]
+        self.content = self.json
 
 
 class AvgPrice(RealTimeQuery):
