@@ -133,7 +133,27 @@ def test_tms_search(tms_keys):
 def test_media_wiki():
     """Tests the MediaWiki Routes"""
 
-    query_instance = MediaWiki('osrs', action='ask', format='json', query='[[Category:Items]][[Production JSON::+]]|?Production')
+    query_instance = MediaWiki('osrs', action='ask', format='json', query='[[Category:Items]][[Production JSON::+]]|?Production JSON')
     response = query_instance.response
 
     assert response.status_code == 200
+
+
+@fixture
+def production_keys():
+    # Keys that are returned by the tms query - assuming full is used (otherwise no keys)
+    return['ticks', 'materials', 'facilities', 'skills', 'members', 'output']
+
+
+def test_ask_production(production_keys):
+    """Tests the MediaWiki Ask - Production JSON Request"""
+
+    query_instance = MediaWiki('osrs')
+
+    item = 'Cake'
+    query_instance.ask_production(item=item)
+    response = query_instance.content
+
+    assert isinstance(response, dict), "Response should be a json item"
+    assert item in response.keys(), "Item name should be the key in content"
+    assert set(production_keys).issubset(response[item].keys()), "All keys should be in the response"

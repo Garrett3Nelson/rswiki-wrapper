@@ -47,6 +47,14 @@ All MediaWiki requests take four inputs:
 
 You can test queries in the [API Sandbox](https://runescape.wiki/w/Special:ApiSandbox) to determine the output and assist in parsing the JSON returned. `.json` and `.content` are identical for MediaWiki requests although both are exposed to allow future expansion of known common queries.
 
+#### Media Wiki Helper Functions
+There are several helper functions built into the wrapper, with more to come. If using the helper functions, initialize a blank MediaWiki instance with `query = MediaWiki({game})` and then call the helper function with `query.function()`.
+
+* `ask()` is a shortcut to the Semantic MediaWiki Ask API. The `query` must still be entered as a kwarg (`query='x'`)
+* `ask_production()` is a shortcut to query Production JSON information for any item(s) or category.
+  * Input `item={item}` where the format matches the Ask API `[[{Item}]][[Production JSON::+]]|?Production JSON`
+  * Output `.content` outputs a dictionary where item names are the keys and production information is the values. As always, the `.response` and `.json` attributes can provide full details of the query.
+
 ### Weird Gloop Usage
 
 Weird Gloop provides two main routes: `exchange` for Grand Exchange daily information and `runescape` for Runescape (RS3) information. The classes to access these routes are `Exchange` and `Runescape`.

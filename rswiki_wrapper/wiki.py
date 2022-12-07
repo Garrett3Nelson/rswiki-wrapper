@@ -4,12 +4,24 @@
 import requests
 import requests.utils
 from collections import OrderedDict
+from time import sleep
 
 
 class WikiQuery(object):
     def __init__(self, url, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         super().__init__()
 
+        if user_agent == 'RS Wiki API Python Wrapper - Default':
+            print("WARNING: You are using the default user_agent. Please configure the query with the parameter user_agent='{Project Name} - {Contact Information}'")
+
+        headers = {
+            'User-Agent': user_agent
+        }
+        if url != '':
+            self.response = requests.get(url, headers=headers)
+
+    # For on-demand refreshing of a query
+    def update(self, url, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         if user_agent == 'RS Wiki API Python Wrapper - Default':
             print("WARNING: You are using the default user_agent. Please configure the query with the parameter user_agent='{Project Name} - {Contact Information}'")
 
@@ -132,13 +144,61 @@ class MediaWiki(WikiQuery):
             print('Invalid game; choose osrs or rs3')
 
         if game == 'osrs':
-            base_url = 'https://oldschool.runescape.wiki/api.php'
+            self.base_url = 'https://oldschool.runescape.wiki/api.php'
         else:
-            base_url = 'https://runescape.wiki/api.php'
+            self.base_url = 'https://runescape.wiki/api.php'
 
-        url = create_url(base_url, **kwargs)
-        super().__init__(url, user_agent)
+        self.user_agent = user_agent
 
-        self.json = self.response.json(object_pairs_hook=OrderedDict)
-        self.content = self.json
+        if kwargs:
+            url = create_url(self.base_url, **kwargs)
+        else:
+            url = ''
+
+        super().__init__(url, self.user_agent)
+
+        if kwargs:
+            self.json = self.response.json(object_pairs_hook=OrderedDict)
+            self.content = self.json
+        else:
+            # Create an empty object - for using built-in methods after
+            self.json = None
+            self.content = None
+
+    # Use the ASK route
+    def ask(self, result_format :str='json', **kwargs):
+        kwargs['action'] = 'ask'
+        kwargs['format'] = result_format
+        url = create_url(self.base_url, **kwargs)
+
+        self.update(url, self.user_agent)
+        self.json = self.response.json()
+
+    # Helper function to format a production JSON query for a specific item or category
+    # item can be 'Category:Items' or 'Cake' for example or None for all Production JSON
+    # All is whether to get all items (aka continue past limit of 50 items per query)
+    # Note: All=True may result in many queries
+    def ask_production(self, item=None, all: bool=False):
+        if item is None:
+            query = '[[Production JSON::+]]'
+        else:
+            query = f'[[{item}]][[Production JSON::+]]|?Production JSON'
+
+        self.ask(query=query)
+
+        self.content = {}
+        for name, prod in self.json['query']['results'].items():
+            self.content[name] = eval(prod['printouts']['Production JSON'][0])
+
+        if all and self.json.get('query-continue-offset') is not None:
+            while self.json.get('query-continue-offset') is not None:
+                new_query = query + f"|offset={self.json.get('query-continue-offset')}"
+                self.ask(query=new_query)
+                for name, prod in self.json['query']['results'].items():
+                    self.content[name] = eval(prod['printouts']['Production JSON'][0])
+
+                sleep(1)
+
+
+#https://oldschool.runescape.wiki/api.php?action=smwbrowse&format=json&browse=subject&params={"subject":"Abyssal_whip","ns":0,"iw":"","subobject":"","options":{"dir":null,"lang":"en-gb","group":null,"printable":null,"offset":null,"including":false,"showInverse":false,"showAll":true,"showGroup":true,"showSort":false,"api":true,"valuelistlimit.out":"30","valuelistlimit.in":"20"}}&formatversion=latest
 
