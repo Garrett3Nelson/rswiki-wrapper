@@ -50,10 +50,18 @@ You can test queries in the [API Sandbox](https://runescape.wiki/w/Special:ApiSa
 #### Media Wiki Helper Functions
 There are several helper functions built into the wrapper, with more to come. If using the helper functions, initialize a blank MediaWiki instance with `query = MediaWiki({game})` and then call the helper function with `query.function()`.
 
-* `ask()` is a shortcut to the Semantic MediaWiki Ask API. The `query` must still be entered as a kwarg (`query='x'`)
+* `ask()` is a shortcut to the Semantic MediaWiki Ask API (`ask` action). To create a query, you can enter the conditions and printouts in list format
 * `ask_production()` is a shortcut to query Production JSON information for any item(s) or category.
   * Input `item={item}` where the format matches the Ask API `[[{Item}]][[Production JSON::+]]|?Production JSON`
   * Output `.content` outputs a dictionary where item names are the keys and production information is the values. As always, the `.response` and `.json` attributes can provide full details of the query.
+* `ask_exchange()` is a shortcut to the Exchange JSON information for any item(s) or category. It will only provide the "static" exchange information - trade limit, alch prices, itemID
+  * Input `item={item}` where the format matches the Ask API `[[Exchange:{Item}]][[Exchange JSON::+]]|?Exchange JSON`
+  * Output `.content` outputs a dictionary where item names are the keys and exchange information is the values. As always, the `.response` and `.json` attributes can provide full details of the query.
+* `browse()` is a shortcut to the Semantic MediaWiki Browse page (`smwbrowse` action). A query must have the browse and params input as kwargs
+* `browse_properties()` is a helper to generate a list of all available properties for a given page. Mimics the output of `Special: Browse`
+  * Input `item` where the item is any page name. The query is optimized/tested on in-game items but will provide a list of properties for any page
+  * Output `.content` is a `dict` item where the keys are property names and the values are the properties (or a list or dict of properties where applicable)
+  * Internal `_clean_properties()` and `_dirty_properties()` will convert built-in values to readable keys and back (ex: '_SKEY' to 'Name')
 
 ### Weird Gloop Usage
 

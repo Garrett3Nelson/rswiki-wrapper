@@ -4,6 +4,7 @@
 import requests
 import requests.utils
 from collections import OrderedDict
+import json
 from time import sleep
 
 
@@ -39,7 +40,7 @@ def create_url(base_url, **kwargs):
         return base_url
 
     # Use f-strings to format the kwargs properly
-    return base_url + '?' + requests.utils.quote('&'.join(f'{k}={v}' for k, v in kwargs.items()), safe="!#$%&'*,/;=?@~")
+    return base_url + '?' + requests.utils.quote('&'.join(f'{k}={v}' for k, v in kwargs.items()), safe="!#$%&'*/;=?@~")
 
 
 class WeirdGloop(WikiQuery):
@@ -160,45 +161,142 @@ class MediaWiki(WikiQuery):
         if kwargs:
             self.json = self.response.json(object_pairs_hook=OrderedDict)
             self.content = self.json
+            pass
         else:
             # Create an empty object - for using built-in methods after
             self.json = None
             self.content = None
 
     # Use the ASK route
-    def ask(self, result_format :str='json', **kwargs):
+    def ask(self, result_format: str = 'json', conditions=None, printouts=None, offset=None, **kwargs):
         kwargs['action'] = 'ask'
         kwargs['format'] = result_format
+        if isinstance(conditions, list):
+            query = '[[' + ']][['.join([x.replace('[', '').replace(']', '') for x in conditions]) + ']]'
+
+            if isinstance(printouts, list):
+                query += '|?' + '|?'.join([x.replace('?', '').replace('|', '') for x in printouts])
+
+            if offset is None:
+                query_mod = ''
+            else:
+                query_mod = f'|offset={offset}'
+            kwargs['query'] = query + query_mod
+
         url = create_url(self.base_url, **kwargs)
 
         self.update(url, self.user_agent)
         self.json = self.response.json()
 
+    #
+    def _get_ask_content(self, conditions: list, printouts: list, get_all=False):
+        for the_name, prods in self.json['query']['results'].items():
+            self.content[the_name] = []
+            for printout in printouts:
+                for prod in prods['printouts'][printout]:
+                    #print(f'{the_name} : {prod}')
+                    self.content[the_name].append(json.loads(prod))
+
+        if get_all and self.json.get('query-continue-offset') is not None:
+            # Sleep 1s to limit hits to API
+            sleep(1)
+            self.ask(conditions=conditions, printouts=printouts, offset=self.json.get('query-continue-offset'))
+
+            self._get_ask_content(conditions, printouts, get_all)
+
     # Helper function to format a production JSON query for a specific item or category
     # item can be 'Category:Items' or 'Cake' for example or None for all Production JSON
     # All is whether to get all items (aka continue past limit of 50 items per query)
     # Note: All=True may result in many queries
-    def ask_production(self, item=None, all: bool=False):
+    def ask_production(self, item=None, get_all: bool = False):
         if item is None:
-            query = '[[Production JSON::+]]'
+            conditions = ['Production JSON::+']
         else:
-            query = f'[[{item}]][[Production JSON::+]]|?Production JSON'
+            conditions = [item, 'Production JSON::+']
 
-        self.ask(query=query)
-
+        printouts = ['Production JSON']
         self.content = {}
-        for name, prod in self.json['query']['results'].items():
-            self.content[name] = eval(prod['printouts']['Production JSON'][0])
 
-        if all and self.json.get('query-continue-offset') is not None:
-            while self.json.get('query-continue-offset') is not None:
-                new_query = query + f"|offset={self.json.get('query-continue-offset')}"
-                self.ask(query=new_query)
-                for name, prod in self.json['query']['results'].items():
-                    self.content[name] = eval(prod['printouts']['Production JSON'][0])
+        self.ask(conditions=conditions, printouts=printouts)
+        self._get_ask_content(conditions, printouts, get_all)
 
-                sleep(1)
+    def ask_exchange(self, item=None, get_all: bool = False):
+        if item is None:
+            conditions = ['Exchange JSON::+']
+        else:
+            conditions = ['Exchange:' + item, 'Exchange JSON::+']
 
+        printouts = ['Exchange JSON']
+        self.content = {}
 
-#https://oldschool.runescape.wiki/api.php?action=smwbrowse&format=json&browse=subject&params={"subject":"Abyssal_whip","ns":0,"iw":"","subobject":"","options":{"dir":null,"lang":"en-gb","group":null,"printable":null,"offset":null,"including":false,"showInverse":false,"showAll":true,"showGroup":true,"showSort":false,"api":true,"valuelistlimit.out":"30","valuelistlimit.in":"20"}}&formatversion=latest
+        self.ask(conditions=conditions, printouts=printouts)
 
+        if len(self.json['query']['results']) > 0:
+            self._get_ask_content(conditions, printouts, get_all)
+
+    def browse(self, result_format='json', format_version='latest', **kwargs):
+        # Add required kwargs for this endpoint
+        kwargs['action'] = 'smwbrowse'
+        kwargs['format'] = result_format
+        kwargs['formatversion'] = format_version
+
+        # Create the proper URL
+        url = create_url(self.base_url, **kwargs)
+
+        # Update the class and parse the json
+        self.update(url, self.user_agent)
+        self.json = self.response.json()
+
+    # Helper to sub out built-in property names to readable versions
+    def _clean_properties(self):
+        keys = self.content.keys()
+        if "_INST" in keys:
+            self.content['Category'] = self.content.pop('_INST')
+
+        if "_MDAT" in keys:
+            self.content['Modification Date'] = self.content.pop('_MDAT')
+
+        if "_SKEY" in keys:
+            self.content['Name'] = self.content.pop('_SKEY')
+
+        if "_SOBJ" in keys:
+            self.content['Subobject'] = self.content.pop('_SOBJ')
+
+    # Change back to original properties
+    def _dirty_properties(self):
+        keys = self.content.keys()
+        if "Category" in keys:
+            self.content['_INST'] = self.content.pop('Category')
+
+        if "Modification Date" in keys:
+            self.content['_MDAT'] = self.content.pop('Modification Date')
+
+        if "Name" in keys:
+            self.content['_SKEY'] = self.content.pop('Name')
+
+        if "Subobject" in keys:
+            self.content['_SOBJ'] = self.content.pop('Subobject')
+
+    def browse_properties(self, item: str):
+        browse_subject = '{"subject":"' + item.replace(" ", "_") + '","ns":0,"iw":"","subobject":"","options":{"dir":null,"lang":"en-gb","group":null,"printable":null,"offset":null,"including":false,"showInverse":false,"showAll":true,"showGroup":true,"showSort":false,"api":true,"valuelistlimit.out":"30","valuelistlimit.in":"20"}}'
+        self.content = {}
+
+        self.browse(browse='subject', params=browse_subject)
+
+        for prop in self.json['query']['data']:
+            if len(prop['dataitem']) == 1:
+                temp_property = prop['dataitem'][0]['item'].replace("#6##", "").replace("#14##", "").replace("#0##", "")
+
+                # If a JSON format is detected, parse str to dict
+                if "{" in temp_property:
+                    temp_property = eval(temp_property)
+            else:
+                temp_property = []
+                for item in prop['dataitem']:
+                    temp_property.append(item['item'].replace("#6##", "").replace("#14##", "").replace("#0##", ""))
+
+                    # If a JSON format is detected, parse str to dict
+                    if "{" in temp_property:
+                        temp_property = eval(temp_property)
+
+            self.content[prop['property']] = temp_property
