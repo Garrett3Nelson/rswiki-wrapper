@@ -1,5 +1,7 @@
 # rswiki_wrapper/wiki.py
 # Contains generic functions for RS Wiki API calls
+import html
+import re
 
 import requests
 import requests.utils
@@ -234,6 +236,10 @@ class MediaWiki(WikiQuery):
         if len(self.json['query']['results']) > 0:
             self._get_ask_content(conditions, printouts, get_all)
 
+    def _clean_browse_result(self):
+        self.cleaned_text = html.unescape(self.response.text)
+        self.cleaned_text = re.sub(r"#\d+##", "", self.cleaned_text)
+
     def browse(self, result_format='json', format_version='latest', **kwargs):
         # Add required kwargs for this endpoint
         kwargs['action'] = 'smwbrowse'
@@ -245,7 +251,9 @@ class MediaWiki(WikiQuery):
 
         # Update the class and parse the json
         self.update(url, self.user_agent)
-        self.json = self.response.json()
+
+        self._clean_browse_result()
+        self.json = json.loads(self.cleaned_text)
 
     # Helper to sub out built-in property names to readable versions
     def _clean_properties(self):
@@ -285,7 +293,7 @@ class MediaWiki(WikiQuery):
 
         for prop in self.json['query']['data']:
             if len(prop['dataitem']) == 1:
-                temp_property = prop['dataitem'][0]['item'].replace("#6##", "").replace("#14##", "").replace("#0##", "")
+                temp_property = (prop['dataitem'][0]['item'])
 
                 # If a JSON format is detected, parse str to dict
                 if "{" in temp_property:
@@ -293,7 +301,7 @@ class MediaWiki(WikiQuery):
             else:
                 temp_property = []
                 for item in prop['dataitem']:
-                    temp_property.append(item['item'].replace("#6##", "").replace("#14##", "").replace("#0##", ""))
+                    temp_property.append((item['item']))
 
                     # If a JSON format is detected, parse str to dict
                     if "{" in temp_property:
