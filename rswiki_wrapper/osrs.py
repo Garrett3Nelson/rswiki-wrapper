@@ -1,7 +1,7 @@
 # rswiki_wrapper/osrs.py
 # Contains all functions for OSRS Wiki API calls
 
-from .wiki import WikiQuery, create_url
+from .wiki import WikiQuery
 from collections import OrderedDict
 
 
@@ -18,8 +18,7 @@ class RealTimeQuery(WikiQuery):
         # Time-Series - Required timestep=X where X is any valid period ('5m', '1hr', '6hr')
 
         base_url = 'https://prices.runescape.wiki/api/v1/' + endpoint + '/' + route
-        url = create_url(base_url, **kwargs)
-        super().__init__(url, user_agent=user_agent)
+        super().__init__(base_url, user_agent=user_agent, **kwargs)
 
         self.json = self.response.json(object_pairs_hook=OrderedDict)
 

@@ -15,32 +15,15 @@ class WikiQuery(object):
         if user_agent == 'RS Wiki API Python Wrapper - Default':
             print("WARNING: You are using the default user_agent. Please configure the query with the parameter user_agent='{Project Name} - {Contact Information}'")
 
-        headers = {
+        self.headers = {
             'User-Agent': user_agent
         }
         if url != '':
-            self.response = requests.get(url, headers=headers)
+            self.response = requests.get(url, headers=self.headers, params=kwargs)
 
     # For on-demand refreshing of a query
-    def update(self, url, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
-        if user_agent == 'RS Wiki API Python Wrapper - Default':
-            print("WARNING: You are using the default user_agent. Please configure the query with the parameter user_agent='{Project Name} - {Contact Information}'")
-
-        headers = {
-            'User-Agent': user_agent
-        }
-
-        self.response = requests.get(url, headers=headers)
-
-
-def create_url(base_url, **kwargs):
-    # TODO: Validate kwargs against valid options
-
-    if len(kwargs) == 0:
-        return base_url
-
-    # Use f-strings to format the kwargs properly
-    return base_url + '?' + requests.utils.quote('&'.join(f'{k}={v}' for k, v in kwargs.items()), safe="!#$%&'*/;=?@~")
+    def update(self, url, **kwargs):
+        self.response = requests.get(url, headers=self.headers, params=kwargs)
 
 
 class WeirdGloop(WikiQuery):
@@ -48,9 +31,8 @@ class WeirdGloop(WikiQuery):
         # https://api.weirdgloop.org/#/ for full documentation
 
         base_url = 'https://api.weirdgloop.org/' + route + game + '/' + endpoint
-        url = create_url(base_url, **kwargs)
 
-        super().__init__(url, user_agent)
+        super().__init__(base_url, user_agent, **kwargs)
 
 
 class Exchange(WeirdGloop):
@@ -152,11 +134,9 @@ class MediaWiki(WikiQuery):
         self.user_agent = user_agent
 
         if kwargs:
-            url = create_url(self.base_url, **kwargs)
+            super().__init__(self.base_url, user_agent, **kwargs)
         else:
-            url = ''
-
-        super().__init__(url, self.user_agent)
+            super().__init__('', user_agent=user_agent)
 
         if kwargs:
             self.json = self.response.json(object_pairs_hook=OrderedDict)
@@ -183,9 +163,7 @@ class MediaWiki(WikiQuery):
                 query_mod = f'|offset={offset}'
             kwargs['query'] = query + query_mod
 
-        url = create_url(self.base_url, **kwargs)
-
-        self.update(url, self.user_agent)
+        self.update(self.base_url, self.user_agent, **kwargs)
         self.json = self.response.json()
 
     #
@@ -240,11 +218,8 @@ class MediaWiki(WikiQuery):
         kwargs['format'] = result_format
         kwargs['formatversion'] = format_version
 
-        # Create the proper URL
-        url = create_url(self.base_url, **kwargs)
-
         # Update the class and parse the json
-        self.update(url, self.user_agent)
+        self.update(self.base_url, self.user_agent, **kwargs)
         self.json = self.response.json()
 
     # Helper to sub out built-in property names to readable versions
