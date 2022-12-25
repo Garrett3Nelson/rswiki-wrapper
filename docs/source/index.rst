@@ -12,12 +12,23 @@ RSWiki-Wrapper is an open-source Python library wrapping functionality of the `R
 
    This project is under active development.
 
+Installation
+------------
 
-To get started using the wrapper, see the :doc:usage section for more information.
+To use RSWiki-Wrapper, first install it using pip:
+
+.. code-block:: console
+
+   (.venv) $ pip install rswiki-wrapper
+
+To get started using the wrapper, see the :doc:`usage` section for more information.
 
 Contents
 --------
 
 .. toctree::
+   :maxdepth: 2
 
    usage
+   endpoints
+   api

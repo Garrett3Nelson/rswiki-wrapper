@@ -9,6 +9,13 @@ from time import sleep
 
 
 class WikiQuery(object):
+    """
+    A class for querying the RS Wiki API.
+
+    :param url: The URL of the API endpoint to query.
+    :param user_agent: (optional) The user agent string to use for the request. Default is 'RS Wiki API Python Wrapper - Default'.
+    :param ``**kwargs``: (optional) Additional parameters to include in the query.
+    """
     def __init__(self, url, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
         super().__init__()
 
@@ -21,13 +28,32 @@ class WikiQuery(object):
         if url != '':
             self.response = requests.get(url, headers=self.headers, params=kwargs)
 
-    # For on-demand refreshing of a query
     def update(self, url, **kwargs):
+        """
+        Refresh the query with a new URL and additional parameters.
+
+        :param url: The URL of the API endpoint to query.
+        :param ``**kwargs``: (optional) Additional parameters to include in the query.
+        """
         self.response = requests.get(url, headers=self.headers, params=kwargs)
 
 
+
 class WeirdGloop(WikiQuery):
-    def __init__(self, route, game, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
+    """
+    This class extends the `WikiQuery` class to make queries to the Weird Gloop API.
+    For general usage, it is recommended to use the specific Exchange or Runescape child classes.
+
+    :param route: The route of the Weird Gloop API to query.
+    :param game: The game to query in the Weird Gloop API.
+    :param endpoint: The endpoint of the Weird Gloop API to query.
+    :param user_agent: The user agent string to use in the query.
+    :param ``**kwargs``: Additional keyword arguments to pass.
+
+    Example:
+        query = WeirdGloop('exchange/history', 'osrs', 'latest', user_agent='My Project - me@example.com', id=2)
+    """
+    def __init__(self, route, game, endpoint, user_agent, **kwargs):
         # https://api.weirdgloop.org/#/ for full documentation
 
         base_url = 'https://api.weirdgloop.org/' + route + game + '/' + endpoint
@@ -35,19 +61,24 @@ class WeirdGloop(WikiQuery):
         super().__init__(base_url, user_agent, **kwargs)
 
 
-class Exchange(WeirdGloop):
-    def __init__(self, game, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
-        # Used for latest / historical prices. Use RealTimeQuery for real-time OSRS prices
-        # Valid games are 'rs', 'rs-fsw-2022', 'osrs', 'osrs-fsw-2022'
-        # Valid endpoints are 'latest', 'all', 'last90d', and 'sample'
-        # https://api.weirdgloop.org/#/ for full documentation
 
-        # Valid kwargs match API endpoint
-        # For latest: required kwargs are EITHER by ID or Name.
-        # For ID use "id=X" where X = itemID OR a trade index like 'GE Common Trade Index'
-        # For Name use "name=X" where name is the exact GE name
-        # For latest: multiple id or names can be used with "|" as the separator ie id='2|4'
-        # This option is not available in any of the history (all, last90d, sample) modes
+class Exchange(WeirdGloop):
+    """
+    This class extends the `WeirdGloop` class to make queries to the exchange history endpoint of the Weird Gloop API.
+
+    :param game: The game to query in the Weird Gloop API. Valid options are 'rs', 'rs-fsw-2022', 'osrs', 'osrs-fsw-2022'.
+    :param endpoint: The endpoint of the Weird Gloop API to query. Valid options are 'latest', 'all', 'last90d', and 'sample'.
+    :param user_agent: The user agent string to use in the query. Default is 'RS Wiki API Python Wrapper - Default'.
+    :param ``**kwargs``: Additional keyword arguments to pass to the `requests.get` function.
+        - Required arguments are either 'id' or 'name', where 'id' is a single item ID or a trade index like 'GE Common Trade Index', and 'name' is the exact GE name of the item. Multiple 'id' or 'name' values can be provided as a pipe-separated string, e.g. "id='2|4'" or "name='Adamant arrow|Rune arrow'".
+        - For the 'all', 'last90d', and 'sample' endpoints, multiple item ID or names cannot be provided.
+
+    Example:
+        query = Exchange('osrs', 'latest', user_agent='My Project - me@example.com', id='2|4')
+        query = Exchange('osrs', 'all', user_agent='My Project - me@example.com', name='Coal')
+    """
+    def __init__(self, game, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
+        # https://api.weirdgloop.org/#/ for full documentation
 
         super().__init__('exchange/history/', game, endpoint, user_agent, **kwargs)
         self.json = self.response.json(object_pairs_hook=OrderedDict)
@@ -55,6 +86,7 @@ class Exchange(WeirdGloop):
         # Exposing .content as the "user desired data" for consistency
         # For latest - there is only one entry per ID (an OrderedDict where the itemIDs are keys)
         # For history - there are many entries and one ID (a list of OrderedDict where each index is 1 day)
+
         # TODO unify the latest/history .context usage for consistency
 
         if endpoint != 'latest':
@@ -65,20 +97,22 @@ class Exchange(WeirdGloop):
 
 
 class Runescape(WeirdGloop):
-    def __init__(self, endpoint, user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
-        # Used for the general endpoints for Runescape information
+    """
+    This class extends the `WeirdGloop` class to make queries to the general endpoints of the Weird Gloop API for Runescape information.
 
-        # Valid endpoints are:
-        # 'vos' - no kwargs
-        # 'vos/history' - kwarg 'page=X' where X is a page number
-        # 'social' - kwarg 'page=X' where X is a page number
-        # 'social/last' - no kwargs
-        # 'tms/current' - see below
-        # 'tms/next' - see below
-        # kwarg 'lang=X' where X is 'en', 'pt' (english, portuguese), 'id' (returns IDs only), 'full' (returns all)
-        # 'tms/search' - see documentation for full kwarg formatting
-        # kwargs lang=X (optional), start=X (dateString or today), end=X (dateString or today), id=X (item ID)
-        # name=X (only name OR id can be used), number=X (number of total results, number OR end can be used)
+    :param endpoint: The endpoint of the Weird Gloop API to query. Valid options are 'vos', 'vos/history', 'social', 'social/last', 'tms/current', 'tms/next', and 'tms/search'.
+    :param user_agent: The user agent string to use in the query.
+    :param ``**kwargs``: Additional keyword arguments to pass to the `requests.get` function.
+        - For the 'vos/history' and 'social' endpoints, a 'page' keyword argument is required, with a page number as the value.
+        - For the 'tms/current' and 'tms/next' endpoints a 'lang' keyword is required, valid values are 'en', 'pt', 'id' (item IDs only), and 'full' (all information)
+        - For the 'tms/search' endpoint, the following keyword arguments are accepted: 'lang' (optional, default is 'en'), 'start' (date string or 'today'), 'end' (date string or 'today'), 'id' (item ID), 'name' (exact name of the item), and 'number' (number of results to return). Either 'id' or 'name' is required, and either 'end' or 'number' is required.
+
+    Example:
+        query = Runescape('tms/search', user_agent='My Project - me@example.com', lang='en', start='2022-01-01', end='2022-01-07', id='42274')
+        query = Runescape('social', user_agent='My Project - me@example.com', page='2')
+    """
+    def __init__(self, endpoint, user_agent, **kwargs):
+        # Used for the general endpoints for Runescape information
 
         if endpoint == 'tms/search':
             if not self._check_kwargs(**kwargs):
@@ -100,20 +134,20 @@ class Runescape(WeirdGloop):
             self.content = self.json
 
     def _check_kwargs(self, **kwargs):
-        keys = kwargs.keys()
+        """
+        This method checks the keyword arguments passed to the `Runescape` class for the 'tms/search' endpoint to ensure that they are valid and do not conflict with each other.
 
-        # Any one of the below is required kwargs
+        :param ``**kwargs``: The keyword arguments to check.
+        :return: A boolean indicating whether the keyword arguments are valid and do not conflict.
+        """
         required_args = ['start', 'number', 'name', 'id']
+        conflicts = [['end', 'number'], ['name', 'id']]
 
-        if not any(x in required_args for x in keys):
-            print('No accepted mandatory keys were detected')
+        if not any(arg in kwargs for arg in required_args):
             return False
 
-        conflicts = [['end', 'number'], ['end', 'id']]
         for conflict in conflicts:
-            # This line counts how many of each conflicting pair are in the keys. If both are there, return False
-            if len([i for i in conflict if i in keys]) == len(conflict):
-                print('Both conflicting pairs were detected')
+            if all(arg in kwargs for arg in conflict):
                 return False
 
         return True
