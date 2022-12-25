@@ -163,7 +163,7 @@ class MediaWiki(WikiQuery):
                 query_mod = f'|offset={offset}'
             kwargs['query'] = query + query_mod
 
-        self.update(self.base_url, self.user_agent, **kwargs)
+        self.update(self.base_url, **kwargs)
         self.json = self.response.json()
 
     #
@@ -219,7 +219,7 @@ class MediaWiki(WikiQuery):
         kwargs['formatversion'] = format_version
 
         # Update the class and parse the json
-        self.update(self.base_url, self.user_agent, **kwargs)
+        self.update(self.base_url, **kwargs)
         self.json = self.response.json()
 
     # Helper to sub out built-in property names to readable versions
