@@ -26,16 +26,6 @@ class RealTimeQuery(WikiQuery):
         The raw JSON response from the API.
     """
     def __init__(self, route="", endpoint="osrs", user_agent='RS Wiki API Python Wrapper - Default', **kwargs):
-        # Valid endpoints are 'osrs', 'dmm', and 'fsw'
-        # https://oldschool.runescape.wiki/w/RuneScape:Real-time_Prices for full documentation
-
-        # Valid kwargs match API endpoint
-        # Latest - Optional kwargs id=X where X is the item ID
-        # Mapping - No kwargs allowed
-        # Price Query - Optional timestamp=X where X is the unix timestamp to return prices for
-        # Time-Series - Required id=X where X is the item ID
-        # Time-Series - Required timestep=X where X is any valid period ('5m', '1hr', '6hr')
-
         base_url = 'https://prices.runescape.wiki/api/v1/' + endpoint + '/' + route
         super().__init__(base_url, user_agent=user_agent, **kwargs)
 
@@ -55,7 +45,7 @@ class Latest(RealTimeQuery):
     :param \**kwargs: For this endpoint, the optional keyword is 'id' and the value is the itemID to query.
     :type \**kwargs: str, optional
 
-    .. note:: It is best practice to query all item ids (do not provide a kwarg) and to loop through the content for specific IDs you require. This results in one query instead of multiple if you provide single ids.
+    .. note:: It is best practice to query all item ids (do not provide a kwarg) and to loop through the `.content` object for specific IDs you require. This requires only one query to the RSWiki API.
     
     .. attribute:: content
        :type: dict

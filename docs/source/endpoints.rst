@@ -15,23 +15,10 @@ This is the parent class for all queries to the Real Time API for OSRS. It is re
 
 .. autoclass:: rswiki_wrapper.osrs.RealTimeQuery
 
-Latest
-------
-
 .. autoclass:: rswiki_wrapper.osrs.Latest
-
-Mapping
--------
 
 .. autoclass:: rswiki_wrapper.osrs.Mapping
 
-Average Price
--------------
-
 .. autoclass:: rswiki_wrapper.osrs.AvgPrice
 
-Time Series
------------
-
 .. autoclass:: rswiki_wrapper.osrs.TimeSeries
-
