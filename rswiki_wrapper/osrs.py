@@ -17,8 +17,8 @@ class RealTimeQuery(WikiQuery):
     :type endpoint: str, optional
     :param user_agent: The user agent string to include in the HTTP request headers.
     :type user_agent: str, optional
-    :param \**kwargs: Additional keyword arguments to include in the query parameters. Valid arguments depend on the route and endpoint being queried.
-    :type \**kwargs: Any, optional
+    :param ``**kwargs``: Additional keyword arguments to include in the query parameters. Valid arguments depend on the route and endpoint being queried.
+    :type ``**kwargs``: Any, optional
     
     .. attribute:: json
        :type: dict
@@ -42,8 +42,8 @@ class Latest(RealTimeQuery):
     :type user_agent: str, optional
     :param game: The game type to provide prices. Valid games 'osrs', 'dmm', and 'fsw'. Default OSRS
     :type game: str, optional
-    :param \**kwargs: For this endpoint, the optional keyword is 'id' and the value is the itemID to query.
-    :type \**kwargs: str, optional
+    :param ``**kwargs``: For this endpoint, the optional keyword is 'id' and the value is the itemID to query.
+    :type ``**kwargs``: str, optional
 
     .. note:: It is best practice to query all item ids (do not provide a kwarg) and to loop through the `.content` object for specific IDs you require. This requires only one query to the RSWiki API.
     
@@ -98,8 +98,8 @@ class AvgPrice(RealTimeQuery):
     :type game: str, optional
     :param user_agent: The user agent string to include in the HTTP request headers.
     :type user_agent: str, optional
-    :param \**kwargs: For both endpoints, 'timestamp' is the keyword and the value is the UNIX formatted timestamp to begin the average.
-    :type \**kwargs: str, optional
+    :param ``**kwargs``: For both endpoints, 'timestamp' is the keyword and the value is the UNIX formatted timestamp to begin the average.
+    :type ``**kwargs``: str, required
 
     .. attribute:: content
        :type: dict
@@ -128,8 +128,8 @@ class TimeSeries(RealTimeQuery):
     :type game: str, optional
     :param user_agent: The user agent string to include in the HTTP request headers.
     :type user_agent: str, optional
-    :param \**kwargs: Additional keyword arguments to include in the query parameters. See note below for description of required kwargs
-    :type \**kwargs: str, required
+    :param ``**kwargs``: Additional keyword arguments to include in the query parameters. See note below for description of required kwargs
+    :type ``**kwargs``: str, required
 
     .. attribute:: content
        :type: list
