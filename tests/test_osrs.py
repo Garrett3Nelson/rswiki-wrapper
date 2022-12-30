@@ -1,8 +1,6 @@
 # tests/test_osrs.py
 
 from pytest import fixture
-from collections import OrderedDict
-
 from rswiki_wrapper import Latest, Mapping, AvgPrice, TimeSeries
 
 
@@ -18,7 +16,7 @@ def test_latest_price(latest_keys):
     query_instance = Latest(id=2)
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
     assert list(response.keys())[0] == '2', "The ID should be in the response"
     assert set(latest_keys).issubset(response['2'].keys()), "All keys should be in the response"
 
@@ -51,7 +49,7 @@ def test_average_price(price_keys):
     query_instance = AvgPrice('5m')
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
     assert list(response.keys())[0] == '2', "The ID should be in the response"
     assert set(price_keys).issubset(response['2'].keys()), "All keys should be in the response"
 
@@ -68,6 +66,6 @@ def test_timeseries(timeseries_keys):
     query_instance = TimeSeries(id=2, timestep='5m')
     response = query_instance.content
 
-    assert isinstance(response[0], OrderedDict)
+    assert isinstance(response[0], dict)
     assert set(timeseries_keys).issubset(response[0].keys()), "All keys should be in the response"
 

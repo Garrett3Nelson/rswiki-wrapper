@@ -1,8 +1,6 @@
 # tests/test_wiki.py
 
 from pytest import fixture
-from collections import OrderedDict
-
 from rswiki_wrapper import Exchange, Runescape, MediaWiki
 
 
@@ -16,12 +14,12 @@ def test_exchange_latest(exchange_keys):
     """Tests an API call to get the latest Grand Exchange price information"""
 
     user_agent = 'RS Wiki API Python Wrapper - Test Suite'
-    query_instance = Exchange('rs', 'latest', id='2|6', user_agent=user_agent)
+    query_instance = Exchange('rs', 'latest', id='2|453', user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
     assert list(response.keys())[0] == '2', "The ID should be in the response"
-    assert set(exchange_keys).issubset(response['2'].keys()), "All keys should be in the response"
+    assert set(exchange_keys).issubset(response['2'][0].keys()), "All keys should be in the response"
 
 
 def test_exchange_history(exchange_keys):
@@ -31,9 +29,9 @@ def test_exchange_history(exchange_keys):
     query_instance = Exchange('osrs', 'last90d', id='2', user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response[0], OrderedDict)
-    assert response[0]['id'] == '2', "The ID should be in the response"
-    assert set(exchange_keys).issubset(response[0].keys()), "All keys should be in the response"
+    assert isinstance(response['2'][0], dict)
+    assert response['2'][0]['id'] == '2', "The ID should be in the response"
+    assert set(exchange_keys).issubset(response['2'][0].keys()), "All keys should be in the response"
 
 
 @fixture
@@ -49,7 +47,7 @@ def test_vos(vos_keys):
     query_instance = Runescape('vos', user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
     assert set(vos_keys).issubset(response.keys()), "All keys should be in the response"
 
 
@@ -60,7 +58,7 @@ def test_vos_history(vos_keys):
     query_instance = Runescape('vos/history', page=2, user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response[0], OrderedDict)
+    assert isinstance(response[0], dict)
     assert set(vos_keys).issubset(response[0].keys()), "All keys should be in the response"
 
 
@@ -78,7 +76,7 @@ def test_social_last(social_keys):
     query_instance = Runescape('social/last', user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
     assert set(social_keys).issubset(response.keys()), "All keys should be in the response"
 
 
@@ -89,7 +87,7 @@ def test_social(social_keys):
     query_instance = Runescape('social', page=2, user_agent=user_agent)
     response = query_instance.content
 
-    assert isinstance(response[0], OrderedDict)
+    assert isinstance(response[0], dict)
     assert set(social_keys).issubset(response[0].keys()), "All keys should be in the response"
 
 
