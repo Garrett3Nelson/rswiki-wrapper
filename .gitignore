@@ -5,3 +5,7 @@
 /pyproject.toml
 /dist/
 /rswiki_wrapper.egg-info/
+/rswiki_wrapper/__pycache__/
+/tests/__pycache__
+/docs/build/
+/docs/source/_autosummary
