@@ -9,7 +9,7 @@
 project = 'RSWiki-Wrapper'
 copyright = '2022, garrett3nelson'
 author = 'garrett3nelson'
-release = '0.0.5'
+release = '0.0.6'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here.
