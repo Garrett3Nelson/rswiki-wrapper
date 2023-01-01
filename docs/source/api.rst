@@ -2,13 +2,13 @@ API
 ===
 
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
    :recursive:
 
    rswiki_wrapper.wiki
 
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
    :recursive:
 
    rswiki_wrapper.osrs

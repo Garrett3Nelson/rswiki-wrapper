@@ -2,7 +2,6 @@
 # Contains all functions for OSRS Wiki API calls
 
 from .wiki import WikiQuery
-from collections import OrderedDict
 
 
 class RealTimeQuery(WikiQuery):
