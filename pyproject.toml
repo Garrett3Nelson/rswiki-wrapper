@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rswiki-wrapper"
+description = "RS Wiki API Wrapper"
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["rswiki", "runescape", 'osrs']
+license = {file='LICENSE'}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+version = "0.0.6"
+dependencies = [
+    "requests"
+]
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
