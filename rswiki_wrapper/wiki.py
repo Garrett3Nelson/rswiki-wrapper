@@ -377,7 +377,7 @@ class MediaWiki(WikiQuery):
 
         Args:
             item (str, optional): The item name to search Production Information. Can also be a Category
-            ``'Category:X'``. If no name is provided, all items with a valid Production JSON will be returned.
+                ``'Category:X'``. If no name is provided, all items with a valid Production JSON will be returned.
             get_all (bool, optional): To recursively search for all matching items, or only provide the first page of
                 results, which by RSWiki convention is 50 results.
 
@@ -452,7 +452,7 @@ class MediaWiki(WikiQuery):
 
         Args:
             item (str, optional): The item name to search Exchange Information. If no name is provided,
-            all items with a valid Exchange JSON will be returned.
+                all items with a valid Exchange JSON will be returned.
             get_all (bool, optional): To recursively search for all matching items, or only provide the first page of
                 results, which by RSWiki convention is 50 results.
 

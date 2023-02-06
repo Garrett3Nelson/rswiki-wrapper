@@ -2,7 +2,6 @@
 /venv/
 /.pytest_cache/
 /__pycache__/
-/pyproject.toml
 /dist/
 /rswiki_wrapper.egg-info/
 /rswiki_wrapper/__pycache__/
